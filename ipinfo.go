@@ -40,23 +40,21 @@ type Failure struct {
 }
 
 func GetIpInfo(ip string) (error, *IpInfo) {
-	err, content := getCallResult(RestApiUrlPrefix + ip)
+	err, content := getRestCallResult(RestApiUrlPrefix + ip)
 	if err != nil {
 		return err, nil
 	}
 
 	if strings.Contains(string(content), `"code":1`) { // error
-		failure := Failure{}
-		err := json.Unmarshal(content, &failure)
-		if err != nil {
+		ret := Failure{}
+		if err := json.Unmarshal(content, &ret); err != nil {
 			return err, nil
 		}
-		return errors.New(failure.Message), nil
+		return errors.New(ret.Message), nil
 	} else { // success
 		ret := Success{}
-		err1 := json.Unmarshal(content, &ret)
-		if err1 != nil {
-			return err1, nil
+		if err := json.Unmarshal(content, &ret); err != nil {
+			return err, nil
 		}
 
 		if ret.Code == 0 {
@@ -66,7 +64,7 @@ func GetIpInfo(ip string) (error, *IpInfo) {
 	}
 }
 
-func getCallResult(url string) (error, []byte) {
+func getRestCallResult(url string) (error, []byte) {
 	resp, err := http.Get(url)
 	if err != nil {
 		return err, nil
