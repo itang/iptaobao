@@ -71,9 +71,9 @@ func getRestCallResult(url string) (error, []byte) {
 	}
 	defer resp.Body.Close()
 
-	body, err1 := ioutil.ReadAll(resp.Body)
-	if err1 != nil {
-		return err1, nil
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err, nil
 	}
 	return nil, body
 }
