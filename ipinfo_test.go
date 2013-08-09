@@ -2,8 +2,9 @@ package iptaobao
 
 import (
 	"fmt"
-	. "github.com/itang/gotang/test"
 	"testing"
+
+	. "github.com/itang/gotang/test"
 )
 
 func TestGetIpInfo(t *testing.T) {
