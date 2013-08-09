@@ -39,41 +39,41 @@ type Failure struct {
 	Message string `json:"data"`
 }
 
-func GetIpInfo(ip string) (error, *IpInfo) {
-	err, content := getRestCallResult(RestApiUrlPrefix + ip)
+func GetIpInfo(ip string) (*IpInfo, error) {
+	content, err := getRestCallResult(RestApiUrlPrefix + ip)
 	if err != nil {
-		return err, nil
+		return nil, err
 	}
 
 	if strings.Contains(string(content), `"code":1`) { // error
 		ret := Failure{}
 		if err := json.Unmarshal(content, &ret); err != nil {
-			return err, nil
+			return nil, err
 		}
-		return errors.New(ret.Message), nil
+		return nil, errors.New(ret.Message)
 	} else { // success
 		ret := Success{}
 		if err := json.Unmarshal(content, &ret); err != nil {
-			return err, nil
+			return nil, err
 		}
 
 		if ret.Code == 0 {
-			return nil, &ret.Data
+			return &ret.Data, nil
 		}
-		return errors.New(fmt.Sprintf("unexpected return code %d", ret.Code)), nil
+		return nil, errors.New(fmt.Sprintf("unexpected return code %d", ret.Code))
 	}
 }
 
-func getRestCallResult(url string) (error, []byte) {
+func getRestCallResult(url string) ([]byte, error) {
 	resp, err := http.Get(url)
 	if err != nil {
-		return err, nil
+		return nil, err
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return err, nil
+		return nil, err
 	}
-	return nil, body
+	return body, nil
 }
